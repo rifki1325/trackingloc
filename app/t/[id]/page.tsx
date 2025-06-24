@@ -13,45 +13,39 @@ export default function Page({ params }: Props) {
   const router = useRouter()
 
   useEffect(() => {
-    const trackLocation = () => {
+    const track = () => {
       if (!navigator.geolocation) {
-        console.error('Geolocation is not supported by your browser')
+        console.error('Geolocation not supported')
         return
       }
 
       navigator.geolocation.getCurrentPosition(
-        async (position) => {
-          const latitude = position.coords.latitude
-          const longitude = position.coords.longitude
+        async (pos) => {
+          const latitude = pos.coords.latitude
+          const longitude = pos.coords.longitude
 
           try {
             const res = await fetch('/api/track', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                id: params.id,
-                latitude,
-                longitude,
-              }),
+              body: JSON.stringify({ id: params.id, latitude, longitude }),
             })
 
             const data = await res.json()
             if (data?.destination) {
               router.push(data.destination)
             } else {
-              console.warn('No destination returned from API')
+              console.warn('No destination found')
             }
           } catch (err) {
-            console.error('Failed to send tracking data', err)
+            console.error('Tracking failed:', err)
           }
         },
-        (error) => {
-          console.error('Failed to get location', error)
-        }
+        (err) => console.error('Location error', err)
       )
     }
 
-    trackLocation()
+    track()
   }, [params.id, router])
 
   return (
