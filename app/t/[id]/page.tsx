@@ -1,12 +1,15 @@
 'use client'
 
 import { useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 
-export default function Page({ params }: { params: { id: string } }) {
+export default function Page() {
+  const { id } = useParams()
   const router = useRouter()
 
   useEffect(() => {
+    if (!id || typeof id !== 'string') return
+
     const track = () => {
       if (!navigator.geolocation) {
         console.error('Geolocation not supported')
@@ -22,7 +25,7 @@ export default function Page({ params }: { params: { id: string } }) {
             const res = await fetch('/api/track', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ id: params.id, latitude, longitude }),
+              body: JSON.stringify({ id, latitude, longitude }),
             })
 
             const data = await res.json()
@@ -40,7 +43,7 @@ export default function Page({ params }: { params: { id: string } }) {
     }
 
     track()
-  }, [params.id, router])
+  }, [id, router])
 
   return (
     <main className="flex items-center justify-center min-h-screen bg-white text-black">
