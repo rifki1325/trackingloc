@@ -1,14 +1,20 @@
-export async function POST(request: Request) {
-  const body = await request.json()
-  const { lat, lon, link } = body
+import { NextRequest, NextResponse } from 'next/server'
+import { linkStore } from '@/lib/linkStore'
+
+export async function POST(req: NextRequest) {
+  const { id, latitude, longitude } = await req.json()
 
   console.log('📍 Data lokasi diterima:')
-  console.log('Link:', link)
-  console.log('Latitude:', lat)
-  console.log('Longitude:', lon)
+  console.log('Link:', id)
+  console.log('Latitude:', latitude)
+  console.log('Longitude:', longitude)
 
-  return new Response(JSON.stringify({ message: 'Lokasi berhasil diterima' }), {
-    status: 200,
-    headers: { 'Content-Type': 'application/json' },
-  })
+  // Cari link tujuan berdasarkan ID
+  const link = linkStore.find((item) => item.id === id)
+
+  if (!link) {
+    return NextResponse.json({ error: 'Link not found' }, { status: 404 })
+  }
+
+  return NextResponse.json({ destination: link.destination })
 }
