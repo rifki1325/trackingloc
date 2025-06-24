@@ -3,13 +3,7 @@
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 
-type Props = {
-  params: {
-    id: string
-  }
-}
-
-export default function Page({ params }: Props) {
+export default function Page({ params }: { params: { id: string } }) {
   const router = useRouter()
 
   useEffect(() => {
